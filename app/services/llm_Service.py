@@ -1,4 +1,6 @@
+import asyncio
 class LLMService:
-    def generate(self,prompt:str)->str:
+    async def generate(self,prompt:str)->str:
+        asyncio.sleep(5)
         return f"llm response for: {prompt}"
     
