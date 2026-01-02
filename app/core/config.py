@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     TEMPERATURE: float=0.7
 
     class Config():
-        env_file=f".env.{os.getenv('dev','prod')}"
+        env_file=f"env/.env.{os.getenv('dev','prod')}"
         case_sensitive=True
 
 @lru_cache
