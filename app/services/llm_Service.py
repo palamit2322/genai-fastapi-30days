@@ -28,7 +28,7 @@ class LLMService:
                 response.choices[0].message.content
             )
         except Exception as e:
-            LLMServiceError(str(e))
+            raise LLMServiceError(str(e))
 
 
 
