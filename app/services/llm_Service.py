@@ -10,25 +10,38 @@ class LLMService:
     def __init__(self):
         self.settings=get_settings()
         self.client=OpenAI(api_key=self.settings.OPENAI_API_KEY)
+        self.MAX_RETRY=3
+        self.MAX_DELAY=1
 
     async def generate(self,user_prompt:str)->str:
         #asyncio.sleep(5)
-        try:
-            response=self.client.chat.completions.create(
-                model=self.settings.MODEL_NAME,
-                messages=[
-                    {"role":"system","content":SYSTEM_PROMPT},
-                    {"role":"user","content":user_prompt}
-                ],
+        last_error = None
+        for attempt in range(1,self.MAX_RETRY+1):
+            try:
+                response=self.client.chat.completions.create(
+                    model=self.settings.MODEL_NAME,
+                    messages=[
+                        {"role":"system","content":SYSTEM_PROMPT},
+                        {"role":"user","content":user_prompt}
+                    ],
                 temperature=self.settings.TEMPERATURE,
                 timeout=10
                 ) 
-            if not response.choices:
-                raise LLMServiceError("Empty response from LLM")
+                if not response.choices:
+                    raise LLMServiceError("Empty response from LLM")
             
-            return response.choices[0].message.content  
-        except Exception as e:
-            raise LLMServiceError(str(e))
+                return response.choices[0].message.content  
+            except Exception as e:
+              last_error=e
+              print(f"Attempt {attempt} failed:{e}")
+              if attempt< self.MAX_RETRY:
+                  asyncio.sleep(self.MAX_DELAY)
+              else:
+                  raise LLMServiceError(f"LLM failed after {self.MAX_RETRY} attempts:str(e)")
+
+                        
+              
+        
 
 
 
