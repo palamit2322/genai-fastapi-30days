@@ -1,8 +1,10 @@
 import asyncio
+import json
 from  openai import OpenAI
 from app.core.config import get_settings
 from app.core.prompts import SYSTEM_PROMPT
 from app.core.exceptions import LLMServiceError
+from app.schemas.llm_response import LLMResponse
 class LLMService:
 
     def __init__(self):
@@ -20,13 +22,11 @@ class LLMService:
                 ],
                 temperature=self.settings.TEMPERATURE,
                 timeout=10
-            )
+                ) 
             if not response.choices:
                 raise LLMServiceError("Empty response from LLM")
             
-            return (
-                response.choices[0].message.content
-            )
+            return response.choices[0].message.content  
         except Exception as e:
             raise LLMServiceError(str(e))
 
