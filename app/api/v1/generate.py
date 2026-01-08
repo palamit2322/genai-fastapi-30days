@@ -21,4 +21,4 @@ async def generate_text(request:PromptRequest, llm_service:LLMService=Depends(ge
             "response": result
         }
     except LLMServiceError as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail=str())
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail=str(e))

@@ -10,11 +10,13 @@ import logging
 logger=logging.getLogger(__name__)
 class LLMService:
 
-    def __init__(self):
+    def __init__(self,system_prompt:str|None=None):
         self.settings=get_settings()
         self.client=OpenAI(api_key=self.settings.OPENAI_API_KEY)
         self.MAX_RETRY=3
         self.MAX_DELAY=1
+        """V2 version compatible"""
+        self.system_prompt=system_prompt or SYSTEM_PROMPT
 
     async def generate(self,user_prompt:str)->str:
         #asyncio.sleep(5)
@@ -25,7 +27,7 @@ class LLMService:
                 response=self.client.chat.completions.create(
                     model=self.settings.MODEL_NAME,
                     messages=[
-                        {"role":"system","content":SYSTEM_PROMPT},
+                        {"role":"system","content":self.system_prompt},
                         {"role":"user","content":user_prompt}
                     ],
                 temperature=self.settings.TEMPERATURE,
